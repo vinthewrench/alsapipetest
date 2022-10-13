@@ -21,7 +21,10 @@ ShairportMgr::ShairportMgr() {
  	_fd = -1;
 	_isRunning = true;
 
- 	pthread_create(&_TID, NULL,
+	pthread_create(&_outputProcessorTID, NULL,
+								  (THREADFUNCPTR) &ShairportMgr::OutputProcessorThread, (void*)this);
+
+ 	pthread_create(&_audioReaderTID, NULL,
 										  (THREADFUNCPTR) &ShairportMgr::AudioReaderThread, (void*)this);
 
 	
@@ -34,8 +37,9 @@ ShairportMgr::~ShairportMgr(){
 	_isRunning = false;
  	pthread_mutex_unlock (&_mutex);
 
-	pthread_join(_TID, NULL);
- 
+	pthread_join(_audioReaderTID, NULL);
+	pthread_join(_outputProcessorTID, NULL);
+
 }
 
 
@@ -205,10 +209,11 @@ static ssize_t safe_read(int fd, void *buf, size_t count)
 
 void ShairportMgr::AudioReader(){
 	
-	dbuf   buff;
-	
+ 
 	int lastError = 0;
 	
+  SampleVector samples;
+
 	printf("AudioReader start \n");
 
 	while(_isRunning){
@@ -225,6 +230,8 @@ void ShairportMgr::AudioReader(){
 				sleep(5);
 				continue;
 			}
+			
+			_output_buffer.flush();
 		}
 		
 		int nbytes = 0;
@@ -233,28 +240,25 @@ void ShairportMgr::AudioReader(){
 			continue;
 		}
 		
-		if(nbytes){
-			buff.reset();
-			buff.reserve(nbytes);
+		if(nbytes > 0){
+		
+			printf("%d bytes avail \n",nbytes);
+
+			int framesize = nbytes / 4;
 			
+			if (framesize > default_blockLength)
+				framesize = default_blockLength;
 			
-			if( safe_read(_fd, buff.data(), nbytes)  != nbytes){
+			samples.resize(framesize);
+	 
+			if( safe_read(_fd, samples.data(), framesize*4)  != framesize*4){
 				printf("read fail  %s \n",strerror(errno));
 				continue;
 			}
-			
-			buff.setSize(nbytes);
-		
-			printf("processed %d bytes\n",nbytes);
-
-#if defined(__APPLE__)
-			printf("processed %d bytes\n",nbytes);
-  #else
-		// Write data.
- 		snd_pcm_writei(_pcm, buff.data(), nbytes / 2 );
- #endif
-
-				// process nbytes
+		 
+	
+			_output_buffer.push(move(samples));
+	 				// process nbytes
 			
 		}
 		else {
@@ -287,3 +291,70 @@ void ShairportMgr::AudioReaderThreadCleanup(void *context){
 	printf("cleanup AudioReader\n");
 }
  
+
+
+void ShairportMgr::OutputProcessor(){
+	
+	
+	while(_isRunning){
+		
+		if(!_isSetup){
+			usleep(200000);
+			continue;
+		}
+		
+		if (_output_buffer.queued_samples() == 0) {
+			// The buffer is empty. Perhaps the output stream is consuming
+			// samples faster than we can produce them. Wait until the buffer
+			// is back at its nominal level to make sure this does not happen
+			// too often.
+			
+			
+			// revisit this..  the 2 is for stereo..
+			
+			_output_buffer.wait_buffer_fill(44100 * 2);
+			
+			
+		}
+		// Get samples from buffer and write to output.
+		SampleVector samples =_output_buffer.pull();
+		
+#if defined(__APPLE__)
+		
+		fprintf(stderr,"Output %ld samples\n", samples.size());
+#else
+		// Write data.
+		
+		snd_pcm_writei(_pcm, samples.data(),  samples.size());
+		 
+#endif
+
+ 
+	}
+}
+  
+ 
+
+
+
+void* ShairportMgr::OutputProcessorThread(void *context){
+	ShairportMgr* d = (ShairportMgr*)context;
+
+	//   the pthread_cleanup_push needs to be balanced with pthread_cleanup_pop
+	pthread_cleanup_push(   &ShairportMgr::OutputProcessorThreadCleanup ,context);
+ 
+	d->OutputProcessor();
+	
+	pthread_exit(NULL);
+	
+	pthread_cleanup_pop(0);
+	return((void *)1);
+}
+
+ 
+void ShairportMgr::OutputProcessorThreadCleanup(void *context){
+	//RadioMgr* d = (RadioMgr*)context;
+
+ 
+//	printf("cleanup sdr\n");
+}

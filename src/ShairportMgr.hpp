@@ -22,6 +22,7 @@
 #include <utility>      // std::pair, std::make_pair
 #include <fcntl.h>
 
+#include "DataBuffer.hpp"
 
 
 #if defined(__APPLE__)
@@ -36,10 +37,17 @@ typedef struct _snd_mixer_elem snd_mixer_elem_t;
 
 using namespace std;
 
+
+typedef double Sample;
+typedef std::vector<Sample> SampleVector;
+
+
 class ShairportMgr {
 	
 public:
+	static constexpr int 	default_blockLength = 4096;
 	
+
 	ShairportMgr();
 	~ShairportMgr();
 	
@@ -62,6 +70,11 @@ private:
 	
 	struct _snd_pcm *   	_pcm;
 
+	
+	// output data queue
+ 	DataBuffer<Sample>   _output_buffer;
+
+	
 	void AudioReader();		// C++ version of thread
 	// C wrappers for GPSReader;
 	static void* AudioReaderThread(void *context);
@@ -71,7 +84,14 @@ private:
 	
 	pthread_cond_t 		_cond = PTHREAD_COND_INITIALIZER;
 	pthread_mutex_t 	_mutex = PTHREAD_MUTEX_INITIALIZER;
-	pthread_t				_TID;
 	
-};
+	
+	void OutputProcessor();		// C++ version of thread
+	// C wrappers for SDRReader;
+	static void* OutputProcessorThread(void *context);
+	static void OutputProcessorThreadCleanup(void *context);
+ 
+	pthread_t			_outputProcessorTID;
+	pthread_t			_audioReaderTID;
+ };
 

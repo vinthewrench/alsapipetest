@@ -33,6 +33,7 @@
 		2EF8450A28F87FD9003E9547 /* CommonDefs.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = CommonDefs.hpp; sourceTree = "<group>"; };
 		2EF8450E28F883D3003E9547 /* dbuf.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = dbuf.hpp; sourceTree = "<group>"; };
 		2EF8450F28F883D3003E9547 /* dbuf.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = dbuf.cpp; sourceTree = "<group>"; };
+		2EF8451128F894D6003E9547 /* DataBuffer.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = DataBuffer.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -69,6 +70,7 @@
 				2EF844FF28F877C0003E9547 /* main.cpp */,
 				2EF8450F28F883D3003E9547 /* dbuf.cpp */,
 				2EF8450E28F883D3003E9547 /* dbuf.hpp */,
+				2EF8451128F894D6003E9547 /* DataBuffer.hpp */,
 				2EF8450A28F87FD9003E9547 /* CommonDefs.hpp */,
 				2EF8450828F8791D003E9547 /* ShairportMgr.hpp */,
 				2EF8450728F8791D003E9547 /* ShairportMgr.cpp */,
