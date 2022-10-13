@@ -100,12 +100,16 @@ bool  ShairportMgr::openAudioPipe( int &error){
 	
 	if((fd = ::open( _audioPath, O_RDONLY  )) <0) {
 		printf("Error %d, %s\n", errno, strerror(errno) );
+		//	ELOG_ERROR(ErrorMgr::FAC_GPS, 0, errno, "OPEN %s", _ttyPath);
+			error = errno;
+			return false;
+		}
 
+		
 		pthread_mutex_lock (&_mutex);
 		_fd = fd;
  		pthread_mutex_unlock (&_mutex);
- 	}
- 
+  
 	return true;
 }
 
