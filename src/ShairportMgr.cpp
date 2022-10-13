@@ -251,7 +251,7 @@ void ShairportMgr::AudioReader(){
 			printf("processed %d bytes\n",nbytes);
   #else
 		// Write data.
- 		snd_pcm_writei(_pcm, buff.data(), nbytes);
+ 		snd_pcm_writei(_pcm, buff.data(), nbytes / 2 );
  #endif
 
 				// process nbytes
