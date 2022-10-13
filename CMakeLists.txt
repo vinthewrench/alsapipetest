@@ -16,6 +16,8 @@ find_package(ALSA REQUIRED)
 
 set(SOURCES
 	src/main.cpp
+	src/ShairportMgr.cpp
+	src/dbuf.cpp
 )
 
  
