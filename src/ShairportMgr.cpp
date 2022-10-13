@@ -177,8 +177,6 @@ void ShairportMgr::AudioReader(){
 			continue;
 		}
 		
-		printf(" FIONREAD found %d bytes  \n",nbytes);
-
 		if(nbytes){
 			buff.reset();
 			buff.reserve(nbytes);
