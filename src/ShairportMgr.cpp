@@ -87,7 +87,7 @@ bool ShairportMgr::begin(const char* audioPath,  int &error){
 									  SND_PCM_FORMAT_S16_LE,
 									  SND_PCM_ACCESS_RW_INTERLEAVED,
 									  2,
-									  44100,
+									  48000,
 									  1,               // allow soft resampling
 									  500000);         // latency in us
 
@@ -319,7 +319,7 @@ void ShairportMgr::OutputProcessor(){
 		// Get samples from buffer and write to output.
 		SampleVector samples =_output_buffer.pull();
 		
- 	 printf("Output %ld samples\n", samples.size());
+// 	 printf("Output %ld samples\n", samples.size());
 
 #if defined(__APPLE__)
 #else
