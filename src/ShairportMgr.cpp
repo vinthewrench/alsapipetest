@@ -61,8 +61,8 @@ bool ShairportMgr::begin(const char* audioPath,  int &error){
 	_audioPath = strdup(audioPath);
  	pthread_mutex_unlock (&_mutex);
  
-	int ignoreError;
-	openAudioPipe(ignoreError);
+//	int ignoreError;
+//	openAudioPipe(ignoreError);
 
 	
 	_isSetup = true;
@@ -177,11 +177,12 @@ void ShairportMgr::AudioReader(){
 			continue;
 		}
 		
+		printf(" FIONREAD found %d bytes  \n",nbytes);
+
 		if(nbytes){
 			buff.reset();
 			buff.reserve(nbytes);
 			
-			printf(" FIONREAD found %d bytes  \n",nbytes);
 			
 			if( safe_read(_fd, buff.data(), nbytes)  != nbytes){
 				printf("read fail  %s \n",strerror(errno));
