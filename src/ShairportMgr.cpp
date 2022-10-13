@@ -319,14 +319,17 @@ void ShairportMgr::OutputProcessor(){
 		// Get samples from buffer and write to output.
 		SampleVector samples =_output_buffer.pull();
 		
-		 printf("Output %ld samples\n", samples.size());
+//		 printf("Output %ld samples\n", samples.size());
 
 #if defined(__APPLE__)
 #else
 		// Write data.
 		
-		snd_pcm_writei(_pcm, samples.data(),  samples.size());
-		 
+		auto r = snd_pcm_writei(_pcm, samples.data(),  samples.size());
+		if(r < 0) {
+			printf("snd_pcm_writei Error %d, %s\n", r, strerror(r) );
+
+		}
 #endif
 
  
