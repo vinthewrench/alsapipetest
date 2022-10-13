@@ -244,12 +244,14 @@ void ShairportMgr::AudioReader(){
 			}
 			
 			buff.setSize(nbytes);
-			
+		
+			printf("processed %d bytes\n",nbytes);
+
 #if defined(__APPLE__)
 			printf("processed %d bytes\n",nbytes);
   #else
 		// Write data.
- 		snd_pcm_writei(_pcm, buff.data(),  buff.size());
+ 		snd_pcm_writei(_pcm, buff.data(), nbytes);
  #endif
 
 				// process nbytes
