@@ -319,7 +319,7 @@ void ShairportMgr::OutputProcessor(){
 		// Get samples from buffer and write to output.
 		SampleVector samples =_output_buffer.pull();
 		
-//		 printf("Output %ld samples\n", samples.size());
+ 	 printf("Output %ld samples\n", samples.size());
 
 #if defined(__APPLE__)
 #else
