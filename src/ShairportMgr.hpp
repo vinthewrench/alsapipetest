@@ -45,7 +45,7 @@ typedef std::vector<Sample> SampleVector;
 class ShairportMgr {
 	
 public:
-	static constexpr int 	default_blockLength = 4096;
+	static constexpr int 	default_blockLength = 8192;
 	
 
 	ShairportMgr();
