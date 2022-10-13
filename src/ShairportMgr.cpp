@@ -96,6 +96,8 @@ bool  ShairportMgr::openAudioPipe( int &error){
 		return false;
 	}
 	
+	printf("openAudioPipe  %s\n", _audioPath);
+
 	int fd ;
 	
 	if((fd = ::open( _audioPath, O_RDONLY  )) <0) {
@@ -151,6 +153,8 @@ void ShairportMgr::AudioReader(){
 	
 	int lastError = 0;
 	
+	printf("AudioReader start \n");
+
 	while(_isRunning){
 		
 		// if not setup // check back later
