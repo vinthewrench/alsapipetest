@@ -9,6 +9,8 @@
 #include <sys/ioctl.h>
 #include "dbuf.hpp"
 
+#define _PCM_  		"duplicate"
+
 
 typedef void * (*THREADFUNCPTR)(void *);
 
@@ -80,8 +82,8 @@ bool ShairportMgr::begin(const char* audioPath,  int &error){
 		r = snd_pcm_set_params(_pcm,
 									  SND_PCM_FORMAT_S16_LE,
 									  SND_PCM_ACCESS_RW_INTERLEAVED,
-									  _nchannels,
-									  samplerate,
+									  2,
+									  44100,
 									  1,               // allow soft resampling
 									  500000);         // latency in us
 
