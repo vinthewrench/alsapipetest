@@ -22,6 +22,18 @@
 #include <utility>      // std::pair, std::make_pair
 #include <fcntl.h>
 
+
+
+#if defined(__APPLE__)
+typedef struct _snd_mixer snd_mixer_t;
+typedef struct _snd_mixer_elem snd_mixer_elem_t;
+#else
+#include <alsa/asoundlib.h>
+#include <alsa/mixer.h>
+
+#endif
+
+
 using namespace std;
 
 class ShairportMgr {
@@ -48,6 +60,7 @@ private:
 	
 	int	 	_fd;		// audio pipe fd
 	
+	struct _snd_pcm *   	_pcm;
 
 	void AudioReader();		// C++ version of thread
 	// C wrappers for GPSReader;

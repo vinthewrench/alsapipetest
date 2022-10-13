@@ -57,14 +57,53 @@ bool ShairportMgr::begin(const char* audioPath,  int &error){
 		free((void*) _audioPath); _audioPath = NULL;
 	}
 
- 	pthread_mutex_lock (&_mutex);
+ 
+	
+#if defined(__APPLE__)
+#else
+
+	int r;
+	 
+	r = snd_pcm_open(&_pcm, _PCM_,
+								SND_PCM_STREAM_PLAYBACK, SND_PCM_NONBLOCK);
+	if( r < 0){
+		error = r;
+		
+		printf("snd_pcm_open error %d, %s\n", errno, strerror(errno) );
+		return false;
+		
+	}
+	else {
+		
+		snd_pcm_nonblock(_pcm, 0);
+		
+		r = snd_pcm_set_params(_pcm,
+									  SND_PCM_FORMAT_S16_LE,
+									  SND_PCM_ACCESS_RW_INTERLEAVED,
+									  _nchannels,
+									  samplerate,
+									  1,               // allow soft resampling
+									  500000);         // latency in us
+
+		
+		if( r < 0){
+			error = r;
+			printf("snd_pcm_set_params error %d, %s\n", errno, strerror(errno) );
+			return false;
+			
+		}
+		
+		
+	}
+#endif
+	
+	pthread_mutex_lock (&_mutex);
 	_audioPath = strdup(audioPath);
- 	pthread_mutex_unlock (&_mutex);
+	pthread_mutex_unlock (&_mutex);
  
 //	int ignoreError;
 //	openAudioPipe(ignoreError);
 
-	
 	_isSetup = true;
 
 	return _isSetup;
@@ -74,7 +113,22 @@ bool ShairportMgr::begin(const char* audioPath,  int &error){
 void ShairportMgr::stop(){
 	
 	if(_isSetup) {
+		closeAudioPipe();
   		_isSetup = false;
+		
+#if defined(__APPLE__)
+#else
+
+	 // Close device.
+	 if (_pcm != NULL) {
+		  snd_pcm_close(_pcm);
+		 _pcm = NULL;
+	 }
+		
+	 
+#endif
+
+		
 		}
 }
 
@@ -189,8 +243,14 @@ void ShairportMgr::AudioReader(){
 			
 			buff.setSize(nbytes);
 			
-			printf("process %d bytes\n",nbytes);
-			// process nbytes
+#if defined(__APPLE__)
+			printf("processed %d bytes\n",nbytes);
+  #else
+		// Write data.
+ 		snd_pcm_writei(_pcm, buff.data(),  buff.size());
+ #endif
+
+				// process nbytes
 			
 		}
 		else {
