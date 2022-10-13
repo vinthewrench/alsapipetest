@@ -242,7 +242,7 @@ void ShairportMgr::AudioReader(){
 		
 		if(nbytes > 0){
 		
-			printf("%d bytes avail \n",nbytes);
+//			printf("%d bytes avail \n",nbytes);
 
 			int framesize = nbytes / 4;
 			
@@ -263,7 +263,7 @@ void ShairportMgr::AudioReader(){
 		}
 		else {
 			// wait for bytes/
-			sleep(1);
+			usleep(10000);
  		}
 	}
 	
@@ -319,9 +319,9 @@ void ShairportMgr::OutputProcessor(){
 		// Get samples from buffer and write to output.
 		SampleVector samples =_output_buffer.pull();
 		
+		 printf("Output %ld samples\n", samples.size());
+
 #if defined(__APPLE__)
-		
-		fprintf(stderr,"Output %ld samples\n", samples.size());
 #else
 		// Write data.
 		
